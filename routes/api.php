@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SpaceController;
+use App\Http\Controllers\SpaceTypeController;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas
@@ -12,21 +14,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 
-    // ===== PRUEBAS TEMPORALES (borrar en el paso 7) =====
-    Route::get('test/admin', fn () => response()->json([
-        'success' => true, 'message' => 'Acceso permitido: rol admin', 'data' => null,
-    ]))->middleware('role:admin');
+    // Catálogo (cliente, staff y admin)
+    Route::middleware('permission:spaces.view')->group(function () {
+        Route::get('spaces', [SpaceController::class, 'index']);
+        Route::get('spaces/{space}', [SpaceController::class, 'show']);
+        Route::get('space-types', [SpaceTypeController::class, 'index']);
+    });
 
-    Route::get('test/staff-or-admin', fn () => response()->json([
-        'success' => true, 'message' => 'Acceso permitido: rol staff o admin', 'data' => null,
-    ]))->middleware('role:admin,staff');
+    // Administración de espacios
+    Route::post('spaces', [SpaceController::class, 'store'])->middleware('permission:spaces.create');
+    Route::put('spaces/{space}', [SpaceController::class, 'update'])->middleware('permission:spaces.update');
+    Route::delete('spaces/{space}', [SpaceController::class, 'destroy'])->middleware('permission:spaces.delete');
 
-    Route::get('test/approve', fn () => response()->json([
-        'success' => true, 'message' => 'Acceso permitido: permiso reservations.approve', 'data' => null,
-    ]))->middleware('permission:reservations.approve');
-
-    Route::get('test/create-reservation', fn () => response()->json([
-        'success' => true, 'message' => 'Acceso permitido: permiso reservations.create', 'data' => null,
-    ]))->middleware('permission:reservations.create');
-    // ===== FIN PRUEBAS TEMPORALES =====
+    // Administración de tipos de espacio
+    Route::get('space-types/{spaceType}', [SpaceTypeController::class, 'show'])->middleware('permission:space_types.view');
+    Route::post('space-types', [SpaceTypeController::class, 'store'])->middleware('permission:space_types.create');
+    Route::put('space-types/{spaceType}', [SpaceTypeController::class, 'update'])->middleware('permission:space_types.update');
+    Route::delete('space-types/{spaceType}', [SpaceTypeController::class, 'destroy'])->middleware('permission:space_types.delete');
 });
