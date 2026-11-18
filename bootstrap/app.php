@@ -5,7 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use App\Exceptions\ApiExceptionHandler;
-use Throwable;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,11 +15,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'permission' => \App\Http\Middleware\EnsureUserHasPermission::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (Throwable $e, Request $request) {
-            // Solo las rutas /api/* usan el formato del trait; el resto sigue como Laravel
+            // Solo las rutas /api/* usan el formato del trait; el resto sigue igual
             if ($request->is('api/*')) {
                 return app(ApiExceptionHandler::class)->handle($e);
             }
