@@ -1,0 +1,27 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Coworking API",
+        "description": "Documentación de la API de Coworking",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/me": {
+            "get": {
+                "summary": "Obtener usuario autenticado",
+                "operationId": "1fdbe7723a0d10b13911b250707d0519",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8000",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        }
+    }
+}
